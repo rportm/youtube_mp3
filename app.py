@@ -1,6 +1,9 @@
-from flask import Flask, request, send_file, render_template
-from pytube import YouTube
+from flask import Flask, request, send_file, render_template, Response
+from pytube import YouTube, Playlist
 import os
+import zipfile
+import io
+import time
 
 app = Flask(__name__)
 
@@ -10,22 +13,42 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/download', methods=['POST'])
-def download():
-    url = request.form['url']
+def download_video(url):
     yt = YouTube(url, use_oauth=True, allow_oauth_cache=True)
     audio_stream = yt.streams.get_audio_only()
     download_path = audio_stream.download()
-    # Here, you would convert download_path file to MP3 if it's not already in that format
-    # For simplicity, let's assume it's already MP3
-    return send_file(download_path, as_attachment=True)
+    return download_path
+
+
+@app.route('/download', methods=['POST'])
+def download():
+    url = request.form['url']
+    if 'playlist' in url:
+        return download_playlist(url)
+    else:
+        download_path = download_video(url)
+        return send_file(download_path, as_attachment=True)
+
+
+def download_playlist(url):
+    try:
+        pl = Playlist(url)
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED) as zip_file:
+            for video_url in pl.video_urls:
+                yt = YouTube(video_url)
+                audio_stream = yt.streams.get_audio_only()
+                download_path = audio_stream.download(skip_existing=True)
+                zip_file.write(download_path, os.path.basename(download_path))
+                os.remove(download_path)
+                time.sleep(1)
+        zip_buffer.seek(0)
+        return send_file(zip_buffer, mimetype='application/zip', as_attachment=True, download_name='playlist.zip')
+    except Exception as e:
+        app.logger.error(f'Error downloading playlist: {e}')
+        return Response(f'An error occurred: {e}', status=500)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
 
-
-
-#
-# yt = YouTube("https://www.youtube.com/watch?v=WeZeTiIP_6k&list=PLH92bjCPygQACbmN693INMu0JrZT6GG2R&index=3", use_oauth=True, allow_oauth_cache=True)
-# audio_stream = yt.streams.get_audio_only()
-# download_path = audio_stream.download()

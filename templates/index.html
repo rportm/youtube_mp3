@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YouTube to MP3 Converter</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -11,6 +10,12 @@
         padding: 0;
         background-color: #f9f9f9;
         color: #333;
+        background-image: url('{{ url_for('static', filename='images/converter_image.jpg') }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        min-height: 100vh; /* This ensures that the background will fill the whole page */
+
     }
     .header {
         background-color: #fff;
@@ -84,27 +89,49 @@
         width: 100%;
         text-align: center;
     }
+    .grey-textbox {
+    background-color: #d3d3d3; /* This is a light grey color */
+    color: #333; /* Text color */
+    margin: 20px auto; /* This centers the textbox and adds space above and below */
+    padding: 20px; /* This adds space inside the textbox */
+    border-radius: 8px; /* This rounds the corners of the textbox */
+    width: 40%; /* This matches the width of your form for consistency */
+    }
+    .form-container p span {
+    font-weight: bold; /* Example to make the step number bold */
+    margin-right: 5px; /* Adds some space after the step number */
+    }
+    .form-container p {
+    text-align: justify;
+    display: block; /* This is actually not necessary since <p> is block-level by default */
+    margin-bottom: 1em; /* This adds a bit of space after each paragraph */
+    }
 </style>
 </head>
 <body>
-    <div class="header">
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Changelog</a></li>
-            <li><a href="#">Add-On</a></li>
-            <li><a href="#">MP3Juice</a></li>
-        </ul>
-    </div>
+{#    <div class="header">#}
+{#        <ul>#}
+{#            <li><a href="#">Home</a></li>#}
+{#            <li><a href="#">FAQ</a></li>#}
+{#        </ul>#}
+{#    </div>#}
     <div class="content">
-        <h1>YouTubeToMP3Converter</h1>
+{#        <h1>YouTubeToMP4Converter</h1>#}
         <div class="form-container">
+            <h1>YouTubeToMP4Converter</h1>
             <form action="/download" method="post">
-                <input type="text" name="url" placeholder="Insert a YouTube video URL">
+                <input type="text" name="url" placeholder="Insert a YouTube video or playlist URL">
                 <input type="submit" value="Download">
             </form>
-            <!-- Add additional content here as needed -->
+                <p>Our YouTube to MP3 Converter allows you to convert your favorite YouTube videos or complete playlists to MP4 files.
+                    It works on your desktop, tablet and mobile device
+                    without the installation of any additional apps.</p>
+                <p>How to download YouTube videos?</p>
+                <p><span>1.</span> Go to YouTube.com and search for a video you would like to download. Then copy the
+                    video URL from the browser address bar (youtube.com/watch?v=id).</p>
+                <p><span>2.</span> Paste the video URL in our YouTube Converter and press the Download button.</p>
+                <p><span>3.</span> The conversion of the video will start, and it may take some time. As soon as the
+                    conversion is completed you will be able to download the converted video.</p></div>
         </div>
-    </div>
 </body>
 </html>
