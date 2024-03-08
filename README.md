@@ -20,3 +20,10 @@ Clone the repository to your local machine:
 git clone https://github.com/rportm/youtube_mp3.git
 cd youtube-audio-downloader
 ```
+
+## Running with Docker
+
+```bash
+docker build -t youtube-audio-downloader .
+docker run -p 4000:80 youtube-audio-downloader
+```
