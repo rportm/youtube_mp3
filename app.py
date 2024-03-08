@@ -5,6 +5,7 @@ import zipfile
 import io
 import time
 
+
 app = Flask(__name__)
 
 
@@ -14,10 +15,23 @@ def index():
 
 
 def download_video(url):
-    yt = YouTube(url, use_oauth=True, allow_oauth_cache=True)
+    yt = YouTube(url)
     audio_stream = yt.streams.get_audio_only()
     download_path = audio_stream.download()
     return download_path
+
+
+def download_video_zip(url):
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED) as zip_file:
+        yt = YouTube(url)
+        audio_stream = yt.streams.get_audio_only()
+        download_path = audio_stream.download()
+        zip_file.write(download_path, os.path.basename(download_path))
+        os.remove(download_path)
+        time.sleep(1)
+    zip_buffer.seek(0)
+    return send_file(zip_buffer, mimetype='application/zip', as_attachment=True, download_name='audio.zip')
 
 
 @app.route('/download', methods=['POST'])
@@ -26,8 +40,9 @@ def download():
     if 'playlist' in url:
         return download_playlist(url)
     else:
-        download_path = download_video(url)
-        return send_file(download_path, as_attachment=True)
+        return download_video_zip(url)
+        # download_path = download_video(url)
+        # return send_file(download_path, as_attachment=True)
 
 
 def download_playlist(url):
@@ -50,6 +65,5 @@ def download_playlist(url):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    #app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
 
